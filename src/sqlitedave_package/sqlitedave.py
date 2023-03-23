@@ -210,16 +210,16 @@ ORDER BY m.name, p.cid
 					return False
 
 	def export_query_to_str(self,qry,szdelimiter=','):
-		self.execute(qry)
+		data = self.query(qry)
 		f = ''
 		sz = ''
-		for k in [i[0] for i in self.cur.description]:
+		for k in [i[0] for i in data.description]:
 			sz += k + szdelimiter
 		f += sz[:-1] + '\n'
 
-		for row in self.cur:
+		for row in data:
 			sz = ''
-			for i in range(0,len(self.cur.description)):
+			for i in range(0,len(data.description)):
 				sz += str(row[i])+ szdelimiter
 
 			f += sz[:-1] + '\n'

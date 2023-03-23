@@ -1,13 +1,12 @@
 [build-system]
-requires = ["hatchling","sqlite3","garbledave_package"]
+requires = ["hatchling","garbledave_package"]
 
 build-backend = "hatchling.build"
 
 [project]
 name = "sqlitedave_package"
-version = "1.0.0"
+version = "1.0.1"
 dependencies = [
-  'sqlite3 >= 1.0.0',
   'garbledave_package >= 1.0.0'
 ]
 authors = [
