@@ -11,6 +11,26 @@ import time
 import sqlite3
 from garbledave_package.garbledave import garbledave 
 
+def main():
+	print('usage: ')
+	print('py -m sqlitedave_package.sqlitedave') 
+	print('-- ')
+	print('py -m sqlitedave_package.query [query or filename] ') 
+	print('-- ')
+	print('py -m sqlitedave_package.execute [query or filename] ') 
+	print('-- ')
+
+	mydb = sqlite_db()
+	mydb.connect()
+	print(mydb.dbstr())
+
+	#csvfilename = 'Station.tsv'
+	#tblname = 'Station'
+	#mydb.load_csv_to_table(csvfilename,tblname,True,'\t')
+	#mydb.export_table_to_csv(csvfilename,tblname)
+	mydb.close()
+
+
 class dbconnection_details: 
 	def __init__(self,DB_NAME=''): 
 		self.DatabaseType='SQLite' 
@@ -412,13 +432,5 @@ ORDER BY m.name, p.cid
 			raise Exception("SQL ERROR:\n\n" + str(e))
 
 if __name__ == '__main__':
-	mydb = sqlite_db()
-	mydb.connect()
-	print(mydb.dbstr())
-
-	#csvfilename = 'Station.tsv'
-	#tblname = 'Station'
-	#mydb.load_csv_to_table(csvfilename,tblname,True,'\t')
-	#mydb.export_table_to_csv(csvfilename,tblname)
-	mydb.close()
+	main()
 

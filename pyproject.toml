@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "sqlitedave_package"
-version = "1.0.1"
+version = "1.1.0"
 dependencies = [
   'garbledave_package >= 1.0.0'
 ]
