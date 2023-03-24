@@ -84,31 +84,20 @@ class sqlite_db:
 
 	def getfielddefs(self,tablename):
 		tablefields = []
-		sql = """
-SELECT 
-  p.name AS column_name, p.type AS data_type
-
-	,CASE 
-        WHEN lower(p.type) in ('text','blob') THEN 'QUOTE'
-        WHEN lower(p.type) in ('real','integer','null') THEN 'NO QUOTE'
-    END as Need_Quotes    
-    ,p.cid as ordinal_position
-
-FROM sqlite_master AS m
-  INNER JOIN pragma_table_info(m.name) AS p
-WHERE m.name NOT IN ('sqlite_sequence')
-	and m.name = '""" + tablename + """'
-ORDER BY m.name, p.cid
-		"""
+		#)cid	name	type	notnull	dflt_value	pk
+		sql = "pragma table_info('" + tablename + "')"
 
 		data = self.query(sql)
 		for row in data:
 			fld = tfield()
 			fld.table_name = tablename
-			fld.column_name = row[0]
-			fld.data_type = row[1]
-			fld.Need_Quotes = row[2]
-			fld.ordinal_position = row[3]
+			fld.ordinal_position = row[0]
+			fld.column_name = row[1]
+			fld.data_type = row[2]
+			if (fld.data_type.lower() == 'text' or fld.data_type.lower() == 'blob'):
+				fld.Need_Quotes = 'QUOTE'
+			else:
+				fld.Need_Quotes = 'NO QUOTE'
 
 			tablefields.append(fld)
 
@@ -260,7 +249,9 @@ ORDER BY m.name, p.cid
 			self.execute('DELETE FROM ' + tblname)
 
 		f = open(csvfile,'r')
-		hdrs = f.read(1000).split('\n')[0].strip().split(szdelimiter)
+		lines = f.readlines()
+
+		hdrs = lines[0].split(szdelimiter)
 		f.close()		
 
 		isqlhdr = 'INSERT INTO ' + tblname + '('
@@ -393,6 +384,7 @@ ORDER BY m.name, p.cid
 			begin_at = time.time() * 1000
 			if not self.dbconn:
 				self.connect()
+			
 			self.dbconn.execute(qry)
 			self.commit()
 			end_at = time.time() * 1000
@@ -415,6 +407,7 @@ if __name__ == '__main__':
 	mydb = sqlite_db()
 	mydb.connect()
 	print(mydb.dbstr())
+	#mydb.execute('CREATE TABLE tesla (date text,close real,volume integer,open real,high real,low real);')
 
 	#csvfilename = 'Station.tsv'
 	#tblname = 'Station'
