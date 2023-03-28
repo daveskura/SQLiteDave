@@ -23,6 +23,7 @@ def main():
 	mydb = sqlite_db()
 	mydb.connect()
 	print(mydb.dbstr())
+	#print(mydb.queryone('SELECT CURRENT_DATE'))
 
 	#csvfilename = 'Station.tsv'
 	#tblname = 'Station'
@@ -393,6 +394,7 @@ class sqlite_db:
 			self.connect()
 
 		all_rows_of_data = self.dbconn.execute(qry)
+	
 		return all_rows_of_data
 
 	def commit(self):
@@ -424,5 +426,6 @@ class sqlite_db:
 			raise Exception("SQL ERROR:\n\n" + str(e))
 
 if __name__ == '__main__':
+	
 	main()
 
