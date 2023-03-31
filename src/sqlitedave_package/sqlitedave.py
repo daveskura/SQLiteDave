@@ -11,6 +11,10 @@ import time
 import sqlite3
 from garbledave_package.garbledave import garbledave 
 
+def splitTupleandGroup(k, inputTuple):
+		args = [iter(inputTuple)] * k
+		return zip(*args)
+
 def main():
 	print('usage: ')
 	print('py -m sqlitedave_package.sqlitedave') 
@@ -23,14 +27,42 @@ def main():
 	mydb = sqlite_db()
 	mydb.connect()
 	print(mydb.dbstr())
-	#print(mydb.queryone('SELECT CURRENT_DATE'))
+
+	print(mydb.export_query_to_str('SELECT CURRENT_DATE as d1,CURRENT_DATE as d2'))
 
 	#csvfilename = 'Station.tsv'
 	#tblname = 'Station'
 	
 	#mydb.load_csv_to_table('a.csv','tablea',True,',')
 	#mydb.export_table_to_csv(csvfilename,tblname)
-	mydb.close()
+
+class disconnected_cursor:
+	def __init__(self,datacursor):
+		self.data = []
+		inputTuple = ()
+		for k in (i[0] for i in datacursor.description):
+			col = (k,None,None,None,None,None,None)
+			inputTuple += col
+
+		self.description = tuple(splitTupleandGroup(7, inputTuple))
+		self.rowcount = 0
+		self.colcount = 0
+		for row in datacursor:
+			self.data.append(row)
+			self.rowcount += 1
+			self.colcount = len(row)
+
+	def __iter__(self):
+		self.iteration_nbr = 0
+		return self
+
+	def __next__(self):
+		if self.iteration_nbr >= self.rowcount:
+			raise StopIteration
+		else:
+			thisrow = self.data[self.iteration_nbr]
+			self.iteration_nbr += 1
+			return thisrow
 
 
 class dbconnection_details: 
@@ -366,6 +398,13 @@ class sqlite_db:
 	def ask_for_database_details(self):
 		self.db_conn_dets.DB_NAME = input('DB_NAME (local_sqlite_db): ') or 'local_sqlite_db'
 
+	def chk_conn(self):
+		try:
+			self.dbconn.cursor()
+			return True
+		except Exception as ex:
+			return False
+
 	def connect(self):
 		connects_entered = False
 
@@ -375,7 +414,7 @@ class sqlite_db:
 
 		try:
 
-			if not self.dbconn:
+			if not self.chk_conn():
 				self.dbconn = sqlite3.connect(self.db_conn_dets.DB_NAME)
 
 				if connects_entered:
@@ -391,11 +430,11 @@ class sqlite_db:
 			raise Exception(str(e))
 
 	def query(self,qry):
-		if not self.dbconn:
+		if not self.chk_conn():
 			self.connect()
 
-		all_rows_of_data = self.dbconn.execute(qry)
-	
+		all_rows_of_data = disconnected_cursor(self.dbconn.execute(qry))
+		self.close()
 		return all_rows_of_data
 
 	def commit(self):
@@ -405,25 +444,22 @@ class sqlite_db:
 	def execute(self,qry):
 		try:
 			begin_at = time.time() * 1000
-			if not self.dbconn:
+			if not self.chk_conn():
 				self.connect()
 			
 			self.dbconn.execute(qry)
 			self.commit()
+			self.close()
 			end_at = time.time() * 1000
 			duration = end_at - begin_at
 			self.logquery(qry,duration)
-			self.close()
 		except Exception as e:
 			raise Exception("SQL ERROR:\n\n" + str(e))
 
 	def queryone(self,select_one_fld):
 		try:
-			if not self.dbconn:
-				self.connect()
-			data = self.dbconn.execute(select_one_fld)
+			data = self.query(select_one_fld)
 			for row in data:
-				self.close()
 				return row[0]
 
 		except Exception as e:
