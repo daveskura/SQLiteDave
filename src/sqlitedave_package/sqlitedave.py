@@ -27,7 +27,8 @@ def main():
 
 	#csvfilename = 'Station.tsv'
 	#tblname = 'Station'
-	#mydb.load_csv_to_table(csvfilename,tblname,True,'\t')
+	
+	#mydb.load_csv_to_table('a.csv','tablea',True,',')
 	#mydb.export_table_to_csv(csvfilename,tblname)
 	mydb.close()
 
@@ -412,6 +413,7 @@ class sqlite_db:
 			end_at = time.time() * 1000
 			duration = end_at - begin_at
 			self.logquery(qry,duration)
+			self.close()
 		except Exception as e:
 			raise Exception("SQL ERROR:\n\n" + str(e))
 
@@ -421,7 +423,9 @@ class sqlite_db:
 				self.connect()
 			data = self.dbconn.execute(select_one_fld)
 			for row in data:
+				self.close()
 				return row[0]
+
 		except Exception as e:
 			raise Exception("SQL ERROR:\n\n" + str(e))
 
