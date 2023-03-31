@@ -27,6 +27,7 @@ def main():
 	mydb = sqlite_db()
 	mydb.connect()
 	print(mydb.dbstr())
+	mydb.load_csv_to_table('postgres_data.tsv','tablec',True,'~')
 
 	#print(mydb.export_query_to_str('SELECT CURRENT_DATE as d1,CURRENT_DATE as d2'))
 
@@ -376,6 +377,7 @@ class sqlite_db:
 			qry = isqlhdr + ilines[:-1]
 			batchcount = 0
 			ilines = ''
+			print(qry)
 			self.execute(qry)
 
 	def does_table_exist(self,tblname):
@@ -438,8 +440,8 @@ class sqlite_db:
 		return all_rows_of_data
 
 	def commit(self):
-		self.dbconn.commit()
-
+		if self.chk_conn():
+			self.dbconn.commit()
 
 	def execute(self,qry):
 		try:
