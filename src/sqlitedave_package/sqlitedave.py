@@ -28,7 +28,7 @@ def main():
 	mydb.connect()
 	print(mydb.dbstr())
 
-	print(mydb.export_query_to_str('SELECT CURRENT_DATE as d1,CURRENT_DATE as d2'))
+	#print(mydb.export_query_to_str('SELECT CURRENT_DATE as d1,CURRENT_DATE as d2'))
 
 	#csvfilename = 'Station.tsv'
 	#tblname = 'Station'
