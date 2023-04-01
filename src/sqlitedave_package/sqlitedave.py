@@ -27,7 +27,7 @@ def main():
 	mydb = sqlite_db()
 	mydb.connect()
 	print(mydb.dbstr())
-	mydb.load_csv_to_table('postgres_data.tsv','tablec',True,'~')
+	#mydb.load_csv_to_table('postgres_data.tsv','tablec',True,'~')
 
 	#print(mydb.export_query_to_str('SELECT CURRENT_DATE as d1,CURRENT_DATE as d2'))
 
