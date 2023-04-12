@@ -27,9 +27,9 @@ def main():
 	mydb = sqlite_db()
 	mydb.connect()
 	print(mydb.dbstr())
-	#mydb.load_csv_to_table('postgres_data.tsv','tablec',True,'~')
+	mydb.load_csv_to_table('complexdata.csv','complex',True,' delimiter ')
 
-	#print(mydb.export_query_to_str('SELECT CURRENT_DATE as d1,CURRENT_DATE as d2'))
+	print(mydb.export_query_to_str('SELECT count(*) FROM complex'))
 
 	#csvfilename = 'Station.tsv'
 	#tblname = 'Station'
@@ -294,6 +294,31 @@ class sqlite_db:
 
 		self.export_query_to_csv('SELECT * FROM ' + tblname,csvfile,szdelimiter)
 
+	def readincsvfile(self,csvfile,szdelimiter):
+		f = open(csvfile,'r')
+		wholefile = f.read()
+		f.close()		
+		lines = []
+		hdr_row = wholefile.split('\n')[0]
+		lines.append(hdr_row)
+		colcount = len(hdr_row.split(szdelimiter))
+		content = wholefile[len(hdr_row):].split(szdelimiter)
+
+		j = 0
+		while j < (len(content)-colcount):
+			newline = ''
+			for i in range(0,colcount-1):
+				newline += content[j+i] + szdelimiter
+			lines.append(newline)
+			j = j + colcount-1
+
+
+		#print('\nlines[0] ',lines[0])
+		#print('\nlines[1] ',lines[1])
+		#print('\nlines[2] ',lines[2])
+		#sys.exit(1)
+		return lines
+
 	def load_csv_to_table(self,csvfile,tblname,withtruncate=True,szdelimiter=',',fields='',withextrafields={}):
 		table_fields = self.getfielddefs(tblname)
 
@@ -303,11 +328,9 @@ class sqlite_db:
 		if withtruncate:
 			self.execute('DELETE FROM ' + tblname)
 
-		f = open(csvfile,'r')
-		lines = f.readlines()
+		lines = self.readincsvfile(csvfile,szdelimiter)
 
 		hdrs = lines[0].split(szdelimiter)
-		f.close()		
 
 		isqlhdr = 'INSERT INTO ' + tblname + '('
 
