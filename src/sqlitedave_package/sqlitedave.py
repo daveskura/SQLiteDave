@@ -326,7 +326,7 @@ class sqlite_db:
 		newstr = ''
 		quotecount = 0
 		cvtmode = False
-		for i in range (0,len(rowwithquotes)-1):
+		for i in range (0,len(rowwithquotes)):
 			if rowwithquotes[i] == '"':
 				quotecount += 1
 			
