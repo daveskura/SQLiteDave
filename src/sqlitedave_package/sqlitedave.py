@@ -30,7 +30,15 @@ def main():
 	#mydb.execute(qry)
 	
 	#mydb.load_csv_to_table('testcase1.csv','testcase1',True,',')
-	#print(mydb.queryone('SELECT COUNT(*) FROM testcase1'))
+	#data = mydb.query('SELECT * FROM testcase1')
+	#print(str(data.colcount))
+	#print(str(data.rowcount))
+	#print(str(data.column_names))
+
+	#for row in data:
+	#	for i in range(0,data.colcount):
+	#		print(row[i])
+
 
 	#print(mydb.export_query_to_str('SELECT count(*) FROM testcase1'))
 
@@ -43,8 +51,10 @@ def main():
 class disconnected_cursor:
 	def __init__(self,datacursor):
 		self.data = []
+		self.column_names = []
 		inputTuple = ()
 		for k in (i[0] for i in datacursor.description):
+			self.column_names.append(k)
 			col = (k,None,None,None,None,None,None)
 			inputTuple += col
 
@@ -118,6 +128,10 @@ class tfield:
 
 class sqlite_db:
 	def __init__(self,DB_NAME=''):
+		self.rowcount = -1
+		self.colcount = -1
+		self.column_names = []
+
 		self.delimiter = ''
 		self.delimiter_replace = '^~^'
 		self.enable_logging = False
@@ -485,9 +499,13 @@ class sqlite_db:
 		if not self.chk_conn():
 			self.connect()
 
-		all_rows_of_data = disconnected_cursor(self.dbconn.execute(qry))
+		self.all_rows_of_data = disconnected_cursor(self.dbconn.execute(qry))
+		self.rowcount = self.all_rows_of_data.rowcount
+		self.colcount = self.all_rows_of_data.colcount
+		self.column_names = self.all_rows_of_data.column_names
+
 		self.close()
-		return all_rows_of_data
+		return self.all_rows_of_data
 
 	def commit(self):
 		if self.chk_conn():
