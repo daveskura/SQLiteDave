@@ -33,12 +33,9 @@ def main():
 		print(query)
 		print('------ ------ ------\n')
 		
-		try:
-			data = mydb.export_query_to_str(query)
-			if data:
-				print(data)
-		except Exception as e:
-			print(str(e))
+		data = mydb.export_query_to_str(query)
+		if data:
+			print(data)
 			
 		mydb.close()
 		

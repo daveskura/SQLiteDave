@@ -29,7 +29,7 @@ def main():
 	print(mydb.dbstr())
 	#mydb.execute(qry)
 	
-	#mydb.load_csv_to_table('testcase1.csv','testcase1',True,',')
+	mydb.load_csv_to_table('servers.csv','servers',True,',')
 	#data = mydb.query('SELECT * FROM testcase1')
 	#print(str(data.colcount))
 	#print(str(data.rowcount))
@@ -429,7 +429,7 @@ class sqlite_db:
 							
 						ilines += newline[:-1] + '),'
 						
-						if batchcount > 500:
+						if batchcount > 1:
 							qry = isqlhdr + ilines[:-1]
 							#print(qry)
 							#sys.exit()
@@ -513,6 +513,7 @@ class sqlite_db:
 
 	def execute(self,qry):
 		try:
+			print(qry)
 			begin_at = time.time() * 1000
 			if not self.chk_conn():
 				self.connect()
